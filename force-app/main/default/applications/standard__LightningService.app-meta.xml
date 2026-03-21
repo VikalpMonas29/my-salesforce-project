@@ -18,20 +18,28 @@
     <tabs>standard-Incident</tabs>
     <tabs>standard-Problem</tabs>
     <tabs>standard-ChangeRequest</tabs>
-    <tabs>Student__c</tabs>
-    <tabs>Employee_REST__c</tabs>
-    <tabs>Error_Log__c</tabs>
+    <tabs>Suggestion__c</tabs>
+    <tabs>Space_Station__c</tabs>
+    <tabs>Resource__c</tabs>
+    <tabs>Supply__c</tabs>
+    <tabs>Position_Search</tabs>
     <uiType>Lightning</uiType>
     <utilityBar>LightningService_UtilityBar</utilityBar>
     <workspaceConfig>
         <mappings>
-            <tab>Employee_REST__c</tab>
+            <tab>Position_Search</tab>
         </mappings>
         <mappings>
-            <tab>Error_Log__c</tab>
+            <tab>Resource__c</tab>
         </mappings>
         <mappings>
-            <tab>Student__c</tab>
+            <tab>Space_Station__c</tab>
+        </mappings>
+        <mappings>
+            <tab>Suggestion__c</tab>
+        </mappings>
+        <mappings>
+            <tab>Supply__c</tab>
         </mappings>
         <mappings>
             <tab>standard-Account</tab>
