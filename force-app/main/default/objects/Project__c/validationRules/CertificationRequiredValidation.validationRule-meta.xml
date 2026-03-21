@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CertificationRequiredValidation</fullName>
+    <active>true</active>
+    <errorConditionFormula>ISPICKVAL( Skill__c ,&apos;SFDC&apos;) &amp;&amp; ISBLANK(TEXT(Certification__c ))||
+ISPICKVAL( Skill__c ,&apos;JAVA&apos;) &amp;&amp; ISBLANK(TEXT(Certification__c ))||
+ISPICKVAL( Skill__c ,&apos;CLOUD&apos;) &amp;&amp; ISBLANK(TEXT(Certification__c))||
+ISPICKVAL( Skill__c ,&apos;Testing&apos;) &amp;&amp; ISBLANK(TEXT(Certification__c))</errorConditionFormula>
+    <errorMessage>Certification is required for selected skill.</errorMessage>
+</ValidationRule>

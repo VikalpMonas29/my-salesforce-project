@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomApplication xmlns="http://soap.sforce.com/2006/04/metadata">
+    <brand>
+        <headerColor>#0070D2</headerColor>
+        <shouldOverrideOrgTheme>false</shouldOverrideOrgTheme>
+    </brand>
+    <formFactors>Small</formFactors>
+    <formFactors>Large</formFactors>
+    <isNavAutoTempTabsDisabled>false</isNavAutoTempTabsDisabled>
+    <isNavPersonalizationDisabled>false</isNavPersonalizationDisabled>
+    <isNavTabPersistenceDisabled>false</isNavTabPersistenceDisabled>
+    <isOmniPinnedViewEnabled>false</isOmniPinnedViewEnabled>
+    <label>Emp Management</label>
+    <navType>Standard</navType>
+    <tabs>standard-Dashboard</tabs>
+    <tabs>standard-report</tabs>
+    <tabs>Project__c</tabs>
+    <tabs>Emplyee__c</tabs>
+    <tabs>Employee_effort__c</tabs>
+    <tabs>Student__c</tabs>
+    <tabs>Employee_REST__c</tabs>
+    <tabs>Error_Log__c</tabs>
+    <tabs>DemoVFP</tabs>
+    <uiType>Lightning</uiType>
+    <utilityBar>Emp_Management_UtilityBar</utilityBar>
+</CustomApplication>
