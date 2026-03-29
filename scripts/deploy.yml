@@ -1,0 +1,90 @@
+name: Salesforce Deployment R1DEV
+ 
+on:
+    push:
+      branches: [ r1dev ]
+      paths:
+        - 'force-app/**'
+        - 'manifest/**'
+ 
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    if: ${{ github.actor != 'dependabot[bot]' }}
+    steps:
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: 'Read PR Body'
+        env:
+                PR_BODY: ${{github.event.pull_request.body}}
+        run: |
+
+          FILE=./parsePR.js
+          if test -f "$FILE"; then
+              echo "Node.js file found. Checking which tests to run"
+              echo $PR_BODY > ./pr_body.txt
+              node ./parsePR.js              
+              TESTS=$(cat testsToRun.txt)
+              echo "APEX_TESTS=$TESTS" >> $GITHUB_ENV    
+          else
+              echo "Node.js file not found. All tests will be run"
+              TESTS=all
+              echo "APEX_TESTS=$TESTS" >> $GITHUB_ENV
+          fi    
+          
+      - name: 'Install Salesforce CLI'
+        run: |
+                  npm install -g @salesforce/cli@latest
+                  sf --version
+      - name: 'Installing sf git delta'
+        run: | 
+                  echo y | sf plugins install sfdx-git-delta
+                  sf plugins 
+                  
+      - name: 'Installing java'
+        run: |
+                sudo apt-get update
+                sudo apt install default-jdk
+
+      - name: 'Populate auth file with SFDX_URL secret of org'
+        shell: bash
+        run: |
+                  echo ${{ secrets.SFDX_R1DEV_URL}} > ./SFDX_R1DEV_URL.txt
+
+      - name: 'Authenticate to R1DEV Org'
+        run: sf org login sfdx-url -f ./SFDX_R1DEV_URL.txt
+
+      - name: 'Create delta packages for new, modified or deleted metadata'
+        run: | 
+                  mkdir changed-sources
+                  sf sgd:source:delta --to "HEAD" --from "HEAD^" -o changed-sources/ --generate-delta -s force-app/ 
+        
+      - name: 'Create a manifest'
+        run: | 
+                  sf project generate manifest -p changed-sources -n manifest/deployPackage
+
+      - name: 'Upload Artifact'
+        uses: actions/upload-artifact@v4
+        with:
+                 name: my-artifact-r1dev
+                 path: changed-sources/
+
+      - name: 'Deploy changes/destructive changes (if any)'
+        run: |
+                 echo "Tests: ${{ env.APEX_TESTS }}"
+                 if [ "${{ env.APEX_TESTS }}" == "all" ]; then
+                    echo "Running deployment with all tests"
+                          sf project deploy start --manifest manifest/deployPackage.xml --pre-destructive-changes manifest/destructiveChangesPre.xml --post-destructive-changes manifest/destructiveChangesPost.xml --test-level RunLocalTests --target-org deployment.user@seed.r1.dev -w 10 --verbose
+                 elif [ "${{ env.APEX_TESTS }}" == "" ]; then
+                    echo "Running deployment with no tests"
+                          sf project deploy start --manifest manifest/deployPackage.xml --pre-destructive-changes manifest/destructiveChangesPre.xml --post-destructive-changes manifest/destructiveChangesPost.xml --test-level NoTestRun --target-org deployment.user@seed.r1.dev -w 10 --verbose
+                 elif [[ "${{ env.APEX_TESTS }}" != "all" && "${{ env.APEX_TESTS }}" != "" ]]; then
+                    echo "Running deployment with specified tests"
+                          sf project deploy start --manifest manifest/deployPackage.xml --pre-destructive-changes manifest/destructiveChangesPre.xml --post-destructive-changes manifest/destructiveChangesPost.xml --test-level RunSpecifiedTests -t ${{env.APEX_TESTS}} --target-org deployment.user@seed.r1.dev -w 10 --verbose
+                 fi
