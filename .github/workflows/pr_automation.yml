@@ -1,0 +1,71 @@
+name: PR Automation – Multi Org
+
+on:
+  pull_request:
+    branches:
+      
+    types: [opened, synchronize]
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  auto-fill-tests:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout PR code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Detect target branch
+        run: |
+          echo "PR Source Branch: ${{ github.head_ref }}"
+          echo "PR Target Branch: ${{ github.base_ref }}"
+
+      - name: Get changed Apex classes
+        run: |
+          TARGET_BRANCH=${{ github.base_ref }}
+
+          git fetch origin $TARGET_BRANCH
+
+          git diff --name-only origin/$TARGET_BRANCH...HEAD > changed_files.txt
+
+          grep '^force-app/.*\.cls$' changed_files.txt \
+            | grep -v 'Test.cls' \
+            | sed 's#.*/##' \
+            | sed 's/\.cls//' > changed_apex_classes.txt || true
+
+          echo "Changed Apex classes:"
+          cat changed_apex_classes.txt || true
+
+      - name: Generate test list
+        run: |
+          python scripts/generate_pr_tests.py
+
+      - name: Update PR description (non-blocking)
+        if: env.TESTS_TO_RUN != ''
+        uses: actions/github-script@v7
+        with:
+          script: |
+            try {
+              const pr = context.payload.pull_request;
+              let body = pr.body || "";
+
+              const newLine = `Apex::[ ${process.env.TESTS_TO_RUN} ]::Apex`;
+
+              body = body.replace(/Apex::\[[^\]]*\]::Apex/g, newLine);
+
+              await github.rest.pulls.update({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                pull_number: pr.number,
+                body: body
+              });
+
+              console.log("PR description updated");
+            } catch (e) {
+              console.log("Failed to update PR description:", e.message);
+            }
