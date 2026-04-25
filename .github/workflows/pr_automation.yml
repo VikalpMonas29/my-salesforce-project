@@ -3,7 +3,8 @@ name: PR Automation – Multi Org
 on:
   pull_request:
     branches:
-      
+      - main
+      - dev
     types: [opened, synchronize]
 
 permissions:
