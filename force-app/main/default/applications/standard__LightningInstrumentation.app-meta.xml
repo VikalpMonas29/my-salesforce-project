@@ -8,8 +8,10 @@
     <label>LightningInstrumentation</label>
     <navType>Standard</navType>
     <tabs>standard-LightningInstrumentation</tabs>
-    <tabs>Student__c</tabs>
-    <tabs>Employee_REST__c</tabs>
-    <tabs>Error_Log__c</tabs>
+    <tabs>Suggestion__c</tabs>
+    <tabs>Space_Station__c</tabs>
+    <tabs>Resource__c</tabs>
+    <tabs>Supply__c</tabs>
+    <tabs>Position_Search</tabs>
     <uiType>Lightning</uiType>
 </CustomApplication>
