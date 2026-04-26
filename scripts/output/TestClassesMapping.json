@@ -1,0 +1,6 @@
+{
+  "AccountController": ["AccountControllerTest"],
+  "Maths": ["TestMaths"],
+  "TVRemoteControl": ["TVRemoteControlTest"],
+  "UpdateAccountSubjectBatch": ["UpdateAccountSubjectBatchTest"]
+}
